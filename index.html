@@ -1,241 +1,818 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Gerund or Infinitive – Spin the Wheel</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gerund or Infinitive — Spin the Wheel</title>
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fafaf7;--fg:#1d1d1b;--card:#fff;--mut:#6b6b66;--bd:#ddd9cf}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--fg:#f1f0ea;--card:#222226;--mut:#a3a29a;--bd:#38383d}}
-:root[data-theme="dark"]{--bg:#17171a;--fg:#f1f0ea;--card:#222226;--mut:#a3a29a;--bd:#38383d}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;text-align:center;padding:12px}
-h1{font-size:20px;margin:4px 0 10px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:640px;margin:0 auto 10px}
-.chip{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:99px;padding:5px 11px;font-size:13px;cursor:pointer}
-.chip.on{background:var(--c);color:#fff;border-color:var(--c)}
-.wrap{position:relative;width:min(92vw,420px);margin:0 auto}
-canvas{width:100%;height:auto;display:block}
-.ptr{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:26px solid var(--fg);z-index:2}
-#go{margin:12px 0 6px;font-size:18px;padding:10px 38px;border:0;border-radius:99px;background:#d85a30;color:#fff;cursor:pointer;font-weight:600}
-#go:disabled{opacity:.5}
-.res{max-width:440px;margin:10px auto;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;min-height:92px}
-.en{font-size:28px;font-weight:700;direction:ltr}
-.ar{font-size:18px;margin:4px 0}
-.rule{display:inline-block;margin-top:6px;padding:3px 12px;border-radius:99px;color:#fff;font-size:14px;direction:ltr}
-.opt{font-size:13px;color:var(--mut)}
-.cnt{font-size:13px;color:var(--mut);margin-top:4px}
-</style></head><body>
-<h1>🎡 Gerund or Infinitive – لف العجلة</h1>
-<div class="chips" id="chips"></div>
-<div class="wrap"><div class="ptr"></div><canvas id="cv" width="840" height="840"></canvas></div>
-<button id="go">SPIN!</button>
-<div class="opt"><label><input type="checkbox" id="rm"> شيل الكلمة بعد ما تظهر</label></div>
-<div class="res" id="res"><div class="ar">اختار الأقسام واضغط SPIN</div></div>
-<div class="cnt" id="cnt"></div>
+  :root {
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #1a202c;
+    --muted: #64748b;
+    --accent: #4f46e5;
+    --accent-hover: #4338ca;
+    --success: #10b981;
+    --error: #ef4444;
+    --border: #e2e8f0;
+    --shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+    --wheel-bg: #fff;
+  }
+  [data-theme="dark"] {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+    --success: #34d399;
+    --error: #f87171;
+    --border: #334155;
+    --shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
+    --wheel-bg: #1e293b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    transition: background 0.3s, color 0.3s;
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 12px 16px 40px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-top: 8px;
+  }
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .theme-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+  }
+  .theme-btn:active { transform: scale(0.9); }
+
+  /* Score board */
+  .scores {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .score-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 10px 6px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .score-card .num {
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: block;
+  }
+  .score-card .label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .score-card.correct .num { color: var(--success); }
+  .score-card.wrong .num { color: var(--error); }
+  .score-card.remaining .num { color: var(--accent); }
+
+  /* Category chips */
+  .chips-wrap {
+    margin-bottom: 14px;
+  }
+  .chips-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    color: var(--text);
+  }
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .chip:active { transform: scale(0.95); }
+
+  /* Wheel area */
+  .wheel-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .pointer {
+    width: 0; height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 22px solid var(--error);
+    position: relative;
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    margin-bottom: -6px;
+  }
+  .wheel-wrap {
+    position: relative;
+    width: min(90vw, 340px);
+    height: min(90vw, 340px);
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: var(--shadow), 0 0 0 6px var(--card);
+    background: var(--wheel-bg);
+  }
+  .spin-btn {
+    margin-top: 18px;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 48px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -4px rgba(79,70,229,0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -4px rgba(79,70,229,0.6); }
+  .spin-btn:active { transform: scale(0.96); }
+  .spin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Result panel */
+  .result-panel {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    display: none;
+    animation: slideUp 0.35s ease;
+  }
+  .result-panel.show { display: block; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-word {
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+  .result-ar {
+    text-align: center;
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    direction: rtl;
+  }
+  .question {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .opt-btn {
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .opt-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+  }
+  .opt-btn.correct {
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .opt-btn.wrong {
+    background: color-mix(in srgb, var(--error) 12%, transparent);
+    border-color: var(--error);
+    color: var(--error);
+  }
+  .opt-btn:disabled { cursor: default; }
+  .feedback {
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    display: none;
+  }
+  .feedback.ok {
+    display: block;
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+  }
+  .feedback.bad {
+    display: block;
+    background: color-mix(in srgb, var(--error) 12%, transparent);
+    color: var(--error);
+  }
+  .next-btn {
+    display: none;
+    width: 100%;
+    margin-top: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { background: var(--accent-hover); }
+
+  .empty-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+  .empty-msg span { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Gerund / Infinitive Wheel</h1>
+    <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+  </header>
+
+  <div class="scores">
+    <div class="score-card correct"><span class="num" id="scCorrect">0</span><span class="label">Correct</span></div>
+    <div class="score-card wrong"><span class="num" id="scWrong">0</span><span class="label">Wrong</span></div>
+    <div class="score-card remaining"><span class="num" id="scRemain">0</span><span class="label">Left</span></div>
+    <div class="score-card"><span class="num" id="scTotal">0</span><span class="label">Total</span></div>
+  </div>
+
+  <div class="chips-wrap">
+    <div class="chips-label">Categories (tap to toggle)</div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="wheel-section">
+    <div class="pointer"></div>
+    <div class="wheel-wrap">
+      <canvas id="wheel" width="680" height="680"></canvas>
+    </div>
+    <button class="spin-btn" id="spinBtn">SPIN</button>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="result-word" id="resWord"></div>
+    <div class="result-ar" id="resAr"></div>
+    <div class="question">What comes after this word?</div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">Spin Again</button>
+  </div>
+</div>
+
 <script>
-const CATS={
-g:{n:"Gerund verbs",c:"#d85a30",r:"+ V-ing"},
-p:{n:"After prepositions",c:"#7f5fd0",r:"+ V-ing (بعد حرف جر)"},
-e:{n:"Expressions",c:"#1d9e75",r:"+ V-ing (تعبير)"},
-i:{n:"Infinitive verbs",c:"#2f7fd1",r:"+ to + infinitive"},
-o:{n:"Verb + object + to",c:"#c2417a",r:"+ object + to + inf"},
-w:{n:"Without to",c:"#8a8a2a",r:"+ infinitive بدون to"},
-b:{n:"Both (small change)",c:"#e0922b",r:"to + inf أو V-ing"},
-c:{n:"Both (big change)",c:"#b8382e",r:"to + inf أو V-ing بمعنى مختلف"},
-n:{n:"Notes",c:"#5a6b78",r:"ملاحظة من الملف"}};
-const RAW=`g|admit|يعترف بـ
-g|adore|يعشق
-g|appreciate|يقدر
-g|avoid|يتجنب
-g|consider (= think of)|يفكر في
-g|delay|يؤخر
-g|deny|ينكر
-g|despise|يمقت – يبغض
-g|detest|يكره بشدة
-g|enjoy|يستمتع بـ
-g|finish|ينهي
-g|face|يواجه
-g|imagine|يتخيل
-g|keep (on)|يستمر في
-g|mention|يذكر
-g|miss|يفتقد
-g|practise|يمارس
-g|prevent|يمنع
-g|quit|يترك
-g|recommend|يوصي بـ
-g|risk|يخاطر
-g|suggest|يقترح
-g|involve|يتضمن
-g|include|يشمل
-g|dislike|يكره
-g|admit to|يعترف
-p|without|بدون
-p|put off|يؤجل
-p|give up|يقلع عن
-p|keen on|حريص على
-p|What/How about|ماذا عن
-p|succeed in|ينجح في
-p|interested in|مهتم بـ
-p|long for|يشتاق إلى
-p|shocked at|صدم لـ
-e|be/get used to|معتاد على
-e|be accustomed to|معتاد على
-e|look forward to|يتطلع إلى
-e|object to|يعترض على
-e|contribute to|يساهم
-e|devote (his life) to|يكرس – يهب
-e|adapt to|يتكيف مع
-e|lead to|يؤدي إلى
-e|addicted to|مدمن لـ
-e|in addition to|بالإضافة إلى
-e|thanks to|بسبب
-e|can't resist|لا يقاوم
-e|can't stand|لا يطيق
-e|can't help|لا يستطيع فعل شيء حيال
-e|(Do you) mind|يمانع
-e|(be) worth|يساوي – يستحق
-e|(Do you) fancy|هل تتخيل – هل تحب
-e|be opposed to|معترض على
-e|it's no use / no good|لا فائدة من
-e|feel like|يميل إلى
-e|I am busy…|مشغول
-e|due to / owing to|بسبب
-e|spend the night…|يقضي الليل
-e|have fun…|يستمتع بـ
-e|have difficulty…|لديه صعوبة
-e|spend his time…|يقضي وقته
-e|waste his time…|يضيع وقته
-e|he stood/sat there…|جلس
-e|I found/saw him…|رأيته
-e|go swimming/shopping/camping…|يذهب لـ (سباحة / تسوق / تخييم)
-i|afford|يقوى على ثمن
-i|agree|يوافق
-i|arrange|يرتب
-i|attempt|يحاول
-i|dare|يجرؤ
-i|decide|يقرر
-i|demand|يطلب
-i|deserve|يستحق
-i|determined|مصمم على
-i|expect|يتوقع
-i|fail|يفشل في
-i|hope|يأمل
-i|learn|يتعلم
-i|long|يشتاق إلى
-i|manage|ينجح في
-i|mean|يقصد
-i|need|يحتاج
-i|offer|يعرض
-i|plan|يخطط
-i|pretend|يتظاهر
-i|refuse|يرفض
-i|seem|يبدو
-i|shocked|يصدم
-i|threaten|يهدد
-i|used|اعتاد أن
-i|want|يريد
-i|warn|يحذر
-i|wish|يأمل
-i|choose|يختار
-i|would like|يريد
-i|would love|يحب أن
-i|would prefer|يفضل
-o|advise|ينصح
-o|allow|يسمح
-o|ask|يطلب
-o|beg|يترجى
-o|consider|يعتبر
-o|enable|يمكّن
-o|encourage|يشجع
-o|help|يساعد
-o|invite|يدعو
-o|order|يأمر
-o|persuade|يقنع
-o|promise|يعد
-o|require|يتطلب
-o|remind|يُذكر
-o|teach|يعلم
-o|tell|يخبر
-w|make|يجعل
-w|let / let's|يدع – هيا بنا
-w|I'd better|من الأفضل أن
-w|I'd rather … than…|أفضّل … من
-w|shall – should|فعل مساعد
-w|will – would|فعل مساعد
-w|can – could|فعل مساعد
-w|may – might|فعل مساعد
-w|must|فعل مساعد
-w|needn't|فعل مساعد
-w|do – don't|مساعد
-w|does – doesn't|مساعد
-w|did – didn't|مساعد
-b|begin|يبدأ
-b|start|يبدأ
-b|can't bear|لا يطيق – لا يتحمل
-b|continue|يستمر في
-b|intend|ينوي
-b|love / like|يحب
-b|hate|يكره
-b|prefer|يفضل
-c|remember|يتذكر
-c|forget|ينسى
-c|regret|يندم – يؤسفه
-c|try|يحاول – يجرب
-c|stop|يتوقف
-i|I don't know what/where/how…|لا أعرف ماذا / أين / كيف أفعل
-i|It took me a long time…|استغرق مني وقتًا طويلًا
-i|the first / the last…|الأول / الأخير
-n|forbid|يمنع
-n|permit|يسمح
-n|hear|يسمع
-n|see|يرى
-n|watch|يشاهد
-n|notice|يلاحظ`;
-const ITEMS=RAW.split("\n").map(l=>{const [c,en,ar]=l.split("|");return{c,en,ar}});
-const on=new Set(Object.keys(CATS));let used=new Set();try{used=new Set(JSON.parse(localStorage.getItem('gi_used')||'[]'));document.getElementById('rm').checked=localStorage.getItem('gi_rm')==='1'}catch(e){}
-function save(){try{localStorage.setItem('gi_used',JSON.stringify([...used]));localStorage.setItem('gi_rm',document.getElementById('rm').checked?'1':'0')}catch(e){}}
-document.getElementById('rm').onchange=save;
-const SEED=["regret", "stop", "try", "forget", "remember", "can't stand", "look forward to", "spend his time…", "admit to", "be/get used to", "suggest", "object to", "enjoy", "can't help", "avoid", "feel like", "recommend", "it's no use / no good", "keep (on)", "deny", "in addition to", "detest", "adapt to", "practise", "(be) worth", "prefer", "afford", "decide", "promise", "manage", "agree", "hope", "enable", "It took me a long time…", "would love", "mean", "threaten", "would prefer", "used"];try{if(!localStorage.getItem('gi_seed1')){SEED.forEach(x=>used.add(x));localStorage.setItem('gi_seed1','1');save()}}catch(e){SEED.forEach(x=>used.add(x))}let rot=0,spinning=false;
-const cv=document.getElementById("cv"),ctx=cv.getContext("2d"),S=840;
-const chips=document.getElementById("chips");
-function mk(label,fn,col){const b=document.createElement("button");b.className="chip";b.textContent=label;if(col)b.style.setProperty("--c",col);b.onclick=fn;chips.appendChild(b);return b}
-const btns={};
-Object.keys(CATS).forEach(k=>{btns[k]=mk(CATS[k].n+" ("+ITEMS.filter(x=>x.c==k).length+")",()=>{on.has(k)?on.delete(k):on.add(k);sync()},CATS[k].c)});
-mk("الكل",()=>{Object.keys(CATS).forEach(k=>on.add(k));sync()},"#444");
-mk("إعادة",()=>{used.clear();save();sync()},"#444");
-function pool(){return ITEMS.filter(x=>on.has(x.c)&&!used.has(x.en))}
-function sync(){Object.keys(btns).forEach(k=>btns[k].classList.toggle("on",on.has(k)));draw();document.getElementById("cnt").textContent="الكلمات المتاحة: "+pool().length}
-function draw(){
-const P=pool(),n=P.length;ctx.clearRect(0,0,S,S);
-const cx=S/2,R=S/2-8;
-if(!n){ctx.fillStyle="#999";ctx.font="32px sans-serif";ctx.textAlign="center";ctx.fillText("اختار قسم",cx,cx);return}
-const a=2*Math.PI/n;
-P.forEach((it,i)=>{
-ctx.beginPath();ctx.moveTo(cx,cx);ctx.arc(cx,cx,R,rot+i*a,rot+(i+1)*a);ctx.closePath();
-ctx.fillStyle=["#d85a30","#2f7fd1","#1d9e75","#e0922b","#7f5fd0","#c2417a"][i%6];ctx.fill();
-if(n<=140){ctx.strokeStyle="#fff";ctx.lineWidth=n>60?1:2;ctx.stroke()}
-if(n<=45){ctx.save();ctx.translate(cx,cx);ctx.rotate(rot+(i+.5)*a);ctx.fillStyle="#fff";ctx.textAlign="right";ctx.textBaseline="middle";
-const fs=Math.max(14,Math.min(26,a*R*0.5));ctx.font="600 "+fs+"px sans-serif";
-let t=it.en;if(t.length>22)t=t.slice(0,21)+"…";ctx.fillText(t,R-16,0);ctx.restore()}
-});
-ctx.beginPath();ctx.arc(cx,cx,34,0,7);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#bbb";ctx.lineWidth=3;ctx.stroke();
-}
-function show(it){
-document.getElementById("res").innerHTML='<div class="en"></div><div class="ar"></div>';
-const r=document.getElementById("res");
-r.querySelector(".en").textContent=it.en;r.querySelector(".ar").textContent=it.ar;
-}
-document.getElementById("go").onclick=()=>{
-if(spinning)return;const P=pool(),n=P.length;if(!n)return;
-spinning=true;document.getElementById("go").disabled=true;
-const a=2*Math.PI/n,start=rot,tgt=start+Math.random()*2*Math.PI+Math.PI,dur=300,t0=performance.now();
-(function f(t){
-const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,4);rot=start+(tgt-start)*e;draw();
-if(p<1)return requestAnimationFrame(f);
-const ang=(((1.5*Math.PI-rot)%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
-const it=P[Math.min(n-1,Math.floor(ang/a))];show(it);
-if(document.getElementById("rm").checked){used.add(it.en);save()}
-spinning=false;document.getElementById("go").disabled=false;sync();
-})(t0);
+/* ===================== DATA ===================== */
+const DATA = [
+  // 1. Gerund verbs
+  { en: "admit", ar: "يعترف ب", rule: "gerund", cat: "gerund" },
+  { en: "adore", ar: "يعشق", rule: "gerund", cat: "gerund" },
+  { en: "appreciate", ar: "يقدر", rule: "gerund", cat: "gerund" },
+  { en: "avoid", ar: "يتجنب", rule: "gerund", cat: "gerund" },
+  { en: "consider", ar: "يفكر في", rule: "gerund", cat: "gerund" },
+  { en: "delay", ar: "يؤخر", rule: "gerund", cat: "gerund" },
+  { en: "deny", ar: "ينكر", rule: "gerund", cat: "gerund" },
+  { en: "despise", ar: "يمقت / يبغض", rule: "gerund", cat: "gerund" },
+  { en: "detest", ar: "يكره بشدة", rule: "gerund", cat: "gerund" },
+  { en: "enjoy", ar: "يستمتع ب", rule: "gerund", cat: "gerund" },
+  { en: "finish", ar: "ينهي", rule: "gerund", cat: "gerund" },
+  { en: "face", ar: "يواجه", rule: "gerund", cat: "gerund" },
+  { en: "imagine", ar: "يتخيل", rule: "gerund", cat: "gerund" },
+  { en: "keep (on)", ar: "يستمر في", rule: "gerund", cat: "gerund" },
+  { en: "mention", ar: "يذكر", rule: "gerund", cat: "gerund" },
+  { en: "miss", ar: "يفتقد / يفقد", rule: "gerund", cat: "gerund" },
+  { en: "practise", ar: "يمارس", rule: "gerund", cat: "gerund" },
+  { en: "prevent", ar: "يمنع", rule: "gerund", cat: "gerund" },
+  { en: "quit", ar: "يترك", rule: "gerund", cat: "gerund" },
+  { en: "recommend", ar: "يوصي ب", rule: "gerund", cat: "gerund" },
+  { en: "risk", ar: "يخاطر", rule: "gerund", cat: "gerund" },
+  { en: "suggest", ar: "يقترح", rule: "gerund", cat: "gerund" },
+  { en: "involve", ar: "يتضمن", rule: "gerund", cat: "gerund" },
+  { en: "include", ar: "يشمل / يتضمن", rule: "gerund", cat: "gerund" },
+  { en: "dislike", ar: "يكره", rule: "gerund", cat: "gerund" },
+
+  // 2. After prepositions
+  { en: "without", ar: "بدون", rule: "gerund", cat: "prep" },
+  { en: "put off", ar: "يؤجل", rule: "gerund", cat: "prep" },
+  { en: "give up", ar: "يقلع عن", rule: "gerund", cat: "prep" },
+  { en: "keen on", ar: "حريص على", rule: "gerund", cat: "prep" },
+  { en: "What/How about", ar: "ماذا عن", rule: "gerund", cat: "prep" },
+  { en: "succeed in", ar: "ينجح في", rule: "gerund", cat: "prep" },
+  { en: "interested in", ar: "مهتم ب", rule: "gerund", cat: "prep" },
+  { en: "long for", ar: "يشتاق إلى", rule: "gerund", cat: "prep" },
+  { en: "shocked at", ar: "صدم ل", rule: "gerund", cat: "prep" },
+
+  // 3. Expressions
+  { en: "be/get used to", ar: "معتاد على", rule: "gerund", cat: "expr" },
+  { en: "be accustomed to", ar: "معتاد على", rule: "gerund", cat: "expr" },
+  { en: "look forward to", ar: "يتطلع إلى", rule: "gerund", cat: "expr" },
+  { en: "object to", ar: "يعترض على", rule: "gerund", cat: "expr" },
+  { en: "contribute to", ar: "يساهم في", rule: "gerund", cat: "expr" },
+  { en: "devote to", ar: "يكرس / يهب", rule: "gerund", cat: "expr" },
+  { en: "adapt to", ar: "يتكيف مع", rule: "gerund", cat: "expr" },
+  { en: "lead to", ar: "يؤدي إلى", rule: "gerund", cat: "expr" },
+  { en: "addicted to", ar: "مدمن على", rule: "gerund", cat: "expr" },
+  { en: "in addition to", ar: "بالإضافة إلى", rule: "gerund", cat: "expr" },
+  { en: "thanks to", ar: "بسبب", rule: "gerund", cat: "expr" },
+  { en: "can't resist", ar: "لا يقاوم", rule: "gerund", cat: "expr" },
+  { en: "can't stand", ar: "لا يطيق", rule: "gerund", cat: "expr" },
+  { en: "can't help", ar: "لا يستطيع منع نفسه", rule: "gerund", cat: "expr" },
+  { en: "mind", ar: "يمانع", rule: "gerund", cat: "expr" },
+  { en: "worth", ar: "يستحق", rule: "gerund", cat: "expr" },
+  { en: "fancy", ar: "يرغب في", rule: "gerund", cat: "expr" },
+  { en: "be opposed to", ar: "معترض على", rule: "gerund", cat: "expr" },
+  { en: "it's no use / no good", ar: "لا فائدة من", rule: "gerund", cat: "expr" },
+  { en: "feel like", ar: "يرغب في", rule: "gerund", cat: "expr" },
+  { en: "be busy", ar: "مشغول ب", rule: "gerund", cat: "expr" },
+  { en: "due to / owing to", ar: "بسبب", rule: "gerund", cat: "expr" },
+  { en: "spend time", ar: "يقضي وقته", rule: "gerund", cat: "expr" },
+  { en: "have difficulty", ar: "لديه صعوبة في", rule: "gerund", cat: "expr" },
+  { en: "have fun", ar: "يستمتع ب", rule: "gerund", cat: "expr" },
+  { en: "waste time", ar: "يضيع وقته", rule: "gerund", cat: "expr" },
+  { en: "go (swimming…)", ar: "يذهب لـ (سباحة…)", rule: "gerund", cat: "expr" },
+
+  // 4. Infinitive verbs
+  { en: "afford", ar: "يقدر على ثمن", rule: "to-inf", cat: "inf" },
+  { en: "agree", ar: "يوافق", rule: "to-inf", cat: "inf" },
+  { en: "arrange", ar: "يرتب", rule: "to-inf", cat: "inf" },
+  { en: "attempt", ar: "يحاول", rule: "to-inf", cat: "inf" },
+  { en: "dare", ar: "يجرؤ", rule: "to-inf", cat: "inf" },
+  { en: "decide", ar: "يقرر", rule: "to-inf", cat: "inf" },
+  { en: "demand", ar: "يطلب", rule: "to-inf", cat: "inf" },
+  { en: "deserve", ar: "يستحق", rule: "to-inf", cat: "inf" },
+  { en: "determined", ar: "مصمم على", rule: "to-inf", cat: "inf" },
+  { en: "expect", ar: "يتوقع", rule: "to-inf", cat: "inf" },
+  { en: "fail", ar: "يفشل في", rule: "to-inf", cat: "inf" },
+  { en: "hope", ar: "يأمل", rule: "to-inf", cat: "inf" },
+  { en: "learn", ar: "يتعلم", rule: "to-inf", cat: "inf" },
+  { en: "long", ar: "يشتاق إلى", rule: "to-inf", cat: "inf" },
+  { en: "manage", ar: "ينجح في", rule: "to-inf", cat: "inf" },
+  { en: "mean", ar: "يقصد", rule: "to-inf", cat: "inf" },
+  { en: "need", ar: "يحتاج", rule: "to-inf", cat: "inf" },
+  { en: "offer", ar: "يعرض", rule: "to-inf", cat: "inf" },
+  { en: "plan", ar: "يخطط", rule: "to-inf", cat: "inf" },
+  { en: "pretend", ar: "يتظاهر", rule: "to-inf", cat: "inf" },
+  { en: "refuse", ar: "يرفض", rule: "to-inf", cat: "inf" },
+  { en: "seem", ar: "يبدو", rule: "to-inf", cat: "inf" },
+  { en: "threaten", ar: "يهدد", rule: "to-inf", cat: "inf" },
+  { en: "used to", ar: "اعتاد أن", rule: "to-inf", cat: "inf" },
+  { en: "want", ar: "يريد", rule: "to-inf", cat: "inf" },
+  { en: "warn", ar: "يحذر", rule: "to-inf", cat: "inf" },
+  { en: "wish", ar: "يتمنى", rule: "to-inf", cat: "inf" },
+  { en: "choose", ar: "يختار", rule: "to-inf", cat: "inf" },
+  { en: "would like", ar: "يحب", rule: "to-inf", cat: "inf" },
+  { en: "would love", ar: "يحب أن", rule: "to-inf", cat: "inf" },
+  { en: "would prefer", ar: "يفضل", rule: "to-inf", cat: "inf" },
+  { en: "I don't know what/how…", ar: "لا أعرف ماذا / كيف…", rule: "to-inf", cat: "inf" },
+  { en: "It took me a long time…", ar: "استغرق مني وقتاً طويلاً", rule: "to-inf", cat: "inf" },
+  { en: "the first / the last…", ar: "الأول / الأخير…", rule: "to-inf", cat: "inf" },
+
+  // 5. Verb + object + to
+  { en: "advise", ar: "ينصح", rule: "to-inf", cat: "obj-to" },
+  { en: "allow", ar: "يسمح", rule: "to-inf", cat: "obj-to" },
+  { en: "ask", ar: "يطلب", rule: "to-inf", cat: "obj-to" },
+  { en: "beg", ar: "يتوسل", rule: "to-inf", cat: "obj-to" },
+  { en: "encourage", ar: "يشجع", rule: "to-inf", cat: "obj-to" },
+  { en: "help", ar: "يساعد", rule: "to-inf", cat: "obj-to" },
+  { en: "invite", ar: "يدعو", rule: "to-inf", cat: "obj-to" },
+  { en: "order", ar: "يأمر", rule: "to-inf", cat: "obj-to" },
+  { en: "persuade", ar: "يقنع", rule: "to-inf", cat: "obj-to" },
+  { en: "promise", ar: "يعد", rule: "to-inf", cat: "obj-to" },
+  { en: "require", ar: "يتطلب", rule: "to-inf", cat: "obj-to" },
+  { en: "remind", ar: "يذكر", rule: "to-inf", cat: "obj-to" },
+  { en: "teach", ar: "يعلم", rule: "to-inf", cat: "obj-to" },
+  { en: "tell", ar: "يخبر", rule: "to-inf", cat: "obj-to" },
+
+  // 6. Without "to"
+  { en: "make", ar: "يجعل", rule: "bare", cat: "bare" },
+  { en: "let", ar: "يسمح / يدع", rule: "bare", cat: "bare" },
+  { en: "I'd better", ar: "من الأفضل أن", rule: "bare", cat: "bare" },
+  { en: "I'd rather", ar: "أفضل أن", rule: "bare", cat: "bare" },
+  { en: "can / could", ar: "يستطيع", rule: "bare", cat: "bare" },
+  { en: "may / might", ar: "قد", rule: "bare", cat: "bare" },
+  { en: "must", ar: "يجب", rule: "bare", cat: "bare" },
+  { en: "shall / should", ar: "ينبغي", rule: "bare", cat: "bare" },
+  { en: "will / would", ar: "سوف / كان سـ", rule: "bare", cat: "bare" },
+  { en: "needn't", ar: "ليس من الضروري", rule: "bare", cat: "bare" },
+
+  // 7. Both (small change)
+  { en: "begin", ar: "يبدأ", rule: "both", cat: "both-small" },
+  { en: "start", ar: "يبدأ", rule: "both", cat: "both-small" },
+  { en: "continue", ar: "يستمر", rule: "both", cat: "both-small" },
+  { en: "intend", ar: "ينوي", rule: "both", cat: "both-small" },
+  { en: "love", ar: "يحب", rule: "both", cat: "both-small" },
+  { en: "like", ar: "يحب", rule: "both", cat: "both-small" },
+  { en: "hate", ar: "يكره", rule: "both", cat: "both-small" },
+  { en: "prefer", ar: "يفضل", rule: "both", cat: "both-small" },
+  { en: "can't bear", ar: "لا يتحمل", rule: "both", cat: "both-small" },
+
+  // 8. Both (big change)
+  { en: "remember", ar: "يتذكر", rule: "both", cat: "both-big" },
+  { en: "forget", ar: "ينسى", rule: "both", cat: "both-big" },
+  { en: "regret", ar: "يندم", rule: "both", cat: "both-big" },
+  { en: "try", ar: "يحاول / يجرب", rule: "both", cat: "both-big" },
+  { en: "stop", ar: "يتوقف", rule: "both", cat: "both-big" },
+
+  // 9. Notes (special cases treated as both or to-inf depending)
+  { en: "forbid", ar: "يمنع", rule: "both", cat: "notes" },
+  { en: "permit", ar: "يسمح", rule: "both", cat: "notes" },
+  { en: "hear", ar: "يسمع", rule: "both", cat: "notes" },
+  { en: "see", ar: "يرى", rule: "both", cat: "notes" },
+  { en: "watch", ar: "يشاهد", rule: "both", cat: "notes" },
+  { en: "notice", ar: "يلاحظ", rule: "both", cat: "notes" },
+];
+
+const RULE_LABELS = {
+  "gerund": "gerund (v-ing)",
+  "to-inf": "to + infinitive",
+  "bare": "infinitive without to",
+  "both": "both gerund & infinitive"
 };
-sync();
-</script></body></html>
+
+const CAT_LABELS = {
+  gerund: "Gerund verbs",
+  prep: "After prepositions",
+  expr: "Expressions",
+  inf: "Infinitive verbs",
+  "obj-to": "Verb + object + to",
+  bare: "Without \"to\"",
+  "both-small": "Both (small change)",
+  "both-big": "Both (big change)",
+  notes: "Notes (special)"
+};
+
+const COLORS = ["#4f46e5","#06b6d4","#10b981","#f59e0b","#ef4444","#8b5cf6"];
+
+/* ===================== STATE ===================== */
+let activeCats = new Set(Object.keys(CAT_LABELS));
+let pool = [];          // current items still to answer
+let currentItem = null;
+let angle = 0;
+let spinning = false;
+let correctCount = 0;
+let wrongCount = 0;
+
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
+const resultPanel = document.getElementById("resultPanel");
+const nextBtn = document.getElementById("nextBtn");
+
+/* ===================== INIT ===================== */
+function init() {
+  buildChips();
+  rebuildPool();
+  drawWheel();
+  updateScores();
+  document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+  spinBtn.addEventListener("click", spin);
+  nextBtn.addEventListener("click", () => {
+    resultPanel.classList.remove("show");
+    spinBtn.disabled = false;
+    if (pool.length === 0) {
+      showEmpty();
+    }
+  });
+  // restore theme
+  if (localStorage.getItem("theme") === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  if (isDark) {
+    document.documentElement.removeAttribute("data-theme");
+    document.getElementById("themeBtn").textContent = "🌙";
+    localStorage.setItem("theme", "light");
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.getElementById("themeBtn").textContent = "☀️";
+    localStorage.setItem("theme", "dark");
+  }
+}
+
+function buildChips() {
+  const el = document.getElementById("chips");
+  el.innerHTML = "";
+  // All
+  const allChip = document.createElement("button");
+  allChip.className = "chip active";
+  allChip.textContent = "All";
+  allChip.dataset.cat = "all";
+  allChip.onclick = () => {
+    activeCats = new Set(Object.keys(CAT_LABELS));
+    document.querySelectorAll(".chip").forEach(c => {
+      if (c.dataset.cat !== "reset") c.classList.add("active");
+    });
+    rebuildPool();
+  };
+  el.appendChild(allChip);
+
+  Object.entries(CAT_LABELS).forEach(([key, label]) => {
+    const chip = document.createElement("button");
+    chip.className = "chip active";
+    chip.textContent = label;
+    chip.dataset.cat = key;
+    chip.onclick = () => {
+      if (activeCats.has(key)) {
+        activeCats.delete(key);
+        chip.classList.remove("active");
+      } else {
+        activeCats.add(key);
+        chip.classList.add("active");
+      }
+      // update All chip
+      const all = document.querySelector('.chip[data-cat="all"]');
+      if (activeCats.size === Object.keys(CAT_LABELS).length) all.classList.add("active");
+      else all.classList.remove("active");
+      rebuildPool();
+    };
+    el.appendChild(chip);
+  });
+
+  // Reset scores
+  const resetChip = document.createElement("button");
+  resetChip.className = "chip";
+  resetChip.textContent = "Reset scores";
+  resetChip.dataset.cat = "reset";
+  resetChip.onclick = () => {
+    correctCount = 0;
+    wrongCount = 0;
+    rebuildPool();
+  };
+  el.appendChild(resetChip);
+}
+
+function rebuildPool() {
+  pool = DATA.filter(d => activeCats.has(d.cat)).map(d => ({...d}));
+  // shuffle
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  updateScores();
+  drawWheel();
+  resultPanel.classList.remove("show");
+  spinBtn.disabled = pool.length === 0;
+}
+
+function updateScores() {
+  document.getElementById("scCorrect").textContent = correctCount;
+  document.getElementById("scWrong").textContent = wrongCount;
+  document.getElementById("scRemain").textContent = pool.length;
+  document.getElementById("scTotal").textContent = DATA.filter(d => activeCats.has(d.cat)).length;
+}
+
+/* ===================== WHEEL DRAW ===================== */
+function drawWheel() {
+  const n = pool.length;
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const r = Math.min(cx, cy) - 8;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (n === 0) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--border").trim() || "#e2e8f0";
+    ctx.fill();
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim() || "#64748b";
+    ctx.font = "28px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("No items", cx, cy);
+    return;
+  }
+
+  const slice = (Math.PI * 2) / n;
+  const showLabels = n <= 45;
+
+  for (let i = 0; i < n; i++) {
+    const start = angle + i * slice;
+    const end = start + slice;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    if (showLabels) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(start + slice / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#fff";
+      ctx.font = `bold ${Math.max(11, Math.min(16, 280 / n))}px system-ui`;
+      ctx.shadowColor = "rgba(0,0,0,0.4)";
+      ctx.shadowBlur = 3;
+      const label = pool[i].en.length > 14 ? pool[i].en.slice(0, 12) + "…" : pool[i].en;
+      ctx.fillText(label, r - 12, 4);
+      ctx.restore();
+    }
+  }
+
+  // center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--card").trim() || "#fff";
+  ctx.fill();
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--border").trim() || "#e2e8f0";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+/* ===================== SPIN ===================== */
+function spin() {
+  if (spinning || pool.length === 0) return;
+  spinning = true;
+  spinBtn.disabled = true;
+  resultPanel.classList.remove("show");
+
+  const n = pool.length;
+  const slice = 360 / n;
+  // pick random index
+  const idx = Math.floor(Math.random() * n);
+  // target angle so that the middle of the slice lands under the top pointer
+  // pointer is at top = -90deg in canvas coords (or 270deg)
+  // we want the slice center to be at the top after rotation
+  const targetSliceCenter = (idx + 0.5) * slice;
+  // extra full spins for effect (but total duration ~0.3s so keep small)
+  const extraSpins = 2 + Math.random() * 2;
+  const finalDeg = extraSpins * 360 + (360 - targetSliceCenter);
+
+  const startAngle = angle * (180 / Math.PI);
+  const startTime = performance.now();
+  const duration = 300; // ms — very fast as requested
+
+  function animate(now) {
+    const t = Math.min(1, (now - startTime) / duration);
+    // ease-out cubic
+    const ease = 1 - Math.pow(1 - t, 3);
+    const currentDeg = startAngle + finalDeg * ease;
+    angle = (currentDeg * Math.PI) / 180;
+    drawWheel();
+    if (t < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      spinning = false;
+      // finalize exact angle
+      angle = ((360 - targetSliceCenter) * Math.PI) / 180;
+      drawWheel();
+      showResult(pool[idx], idx);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+/* ===================== RESULT & QUIZ ===================== */
+function showResult(item, idx) {
+  currentItem = { item, idx };
+  document.getElementById("resWord").textContent = item.en;
+  document.getElementById("resAr").textContent = item.ar;
+
+  // build options — always the 4 possible rules, shuffled a bit but keep order sensible
+  const allRules = ["gerund", "to-inf", "bare", "both"];
+  // shuffle options for variety
+  for (let i = allRules.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allRules[i], allRules[j]] = [allRules[j], allRules[i]];
+  }
+
+  const optsEl = document.getElementById("options");
+  optsEl.innerHTML = "";
+  allRules.forEach(r => {
+    const btn = document.createElement("button");
+    btn.className = "opt-btn";
+    btn.textContent = RULE_LABELS[r];
+    btn.dataset.rule = r;
+    btn.onclick = () => checkAnswer(r, btn);
+    optsEl.appendChild(btn);
+  });
+
+  document.getElementById("feedback").className = "feedback";
+  document.getElementById("feedback").textContent = "";
+  nextBtn.classList.remove("show");
+  resultPanel.classList.add("show");
+}
+
+function checkAnswer(chosen, btn) {
+  const correctRule = currentItem.item.rule;
+  const allBtns = document.querySelectorAll(".opt-btn");
+  allBtns.forEach(b => b.disabled = true);
+
+  if (chosen === correctRule) {
+    btn.classList.add("correct");
+    document.getElementById("feedback").className = "feedback ok";
+    document.getElementById("feedback").textContent = "✓ Correct!";
+    correctCount++;
+    // remove from pool
+    pool.splice(currentItem.idx, 1);
+  } else {
+    btn.classList.add("wrong");
+    // highlight the right one
+    allBtns.forEach(b => {
+      if (b.dataset.rule === correctRule) b.classList.add("correct");
+    });
+    document.getElementById("feedback").className = "feedback bad";
+    document.getElementById("feedback").textContent = "✗ Wrong. Correct answer: " + RULE_LABELS[correctRule];
+    wrongCount++;
+    // keep item in pool (already there)
+  }
+  updateScores();
+  drawWheel();
+  nextBtn.classList.add("show");
+  if (pool.length === 0) {
+    nextBtn.textContent = "All done! Reset categories to continue";
+  } else {
+    nextBtn.textContent = "Spin Again";
+  }
+}
+
+function showEmpty() {
+  resultPanel.innerHTML = `<div class="empty-msg"><span>🎉</span>Great job! No items left in the selected categories.<br>Toggle categories or hit Reset scores.</div>`;
+  resultPanel.classList.add("show");
+}
+
+init();
+</script>
+</body>
+</html>

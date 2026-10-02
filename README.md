@@ -7,9 +7,12 @@ Open `index.html` in any browser — no build step, no dependencies, works offli
 ## Features
 
 - Canvas-based spinning wheel with pointer and easing animation
-- 10 categories: gerund verbs, after prepositions, expressions, infinitive verbs, verb + object + to, without to, both (small/big change), notes
+- Quiz mode: spin, then pick **gerund** or **to + infinitive** and get instant feedback
+- Live scoreboard — correct / wrong / left / total
+- 9 categories: gerund verbs, after prepositions, expressions, infinitive verbs, verb + object + to, without "to", both (small/big change), notes
 - Toggle categories with the chips above the wheel
-- Optional "remove the word after it appears" mode so you can drill until the list is empty
+- Progress saved in `localStorage`, so you can close the tab and resume
+- Shuffle to reshuffle the word list
 - Arabic translations, light/dark mode (follows system theme), mobile-friendly
 
 ## Usage
