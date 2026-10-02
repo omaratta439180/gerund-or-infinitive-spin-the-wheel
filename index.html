@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gerund or Infinitive – Spin the Wheel</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fafaf7;--fg:#1d1d1b;--card:#fff;--mut:#6b6b66;--bd:#ddd9cf}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--fg:#f1f0ea;--card:#222226;--mut:#a3a29a;--bd:#38383d}}
+:root[data-theme="dark"]{--bg:#17171a;--fg:#f1f0ea;--card:#222226;--mut:#a3a29a;--bd:#38383d}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,"Segoe UI",Tahoma,sans-serif;text-align:center;padding:12px}
+h1{font-size:20px;margin:4px 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:640px;margin:0 auto 10px}
+.chip{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:99px;padding:5px 11px;font-size:13px;cursor:pointer}
+.chip.on{background:var(--c);color:#fff;border-color:var(--c)}
+.wrap{position:relative;width:min(92vw,420px);margin:0 auto}
+canvas{width:100%;height:auto;display:block}
+.ptr{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:26px solid var(--fg);z-index:2}
+#go{margin:12px 0 6px;font-size:18px;padding:10px 38px;border:0;border-radius:99px;background:#d85a30;color:#fff;cursor:pointer;font-weight:600}
+#go:disabled{opacity:.5}
+.res{max-width:440px;margin:10px auto;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;min-height:92px}
+.en{font-size:28px;font-weight:700;direction:ltr}
+.ar{font-size:18px;margin:4px 0}
+.rule{display:inline-block;margin-top:6px;padding:3px 12px;border-radius:99px;color:#fff;font-size:14px;direction:ltr}
+.opt{font-size:13px;color:var(--mut)}
+.cnt{font-size:13px;color:var(--mut);margin-top:4px}
+</style></head><body>
+<h1>🎡 Gerund or Infinitive – لف العجلة</h1>
+<div class="chips" id="chips"></div>
+<div class="wrap"><div class="ptr"></div><canvas id="cv" width="840" height="840"></canvas></div>
+<button id="go">SPIN!</button>
+<div class="opt"><label><input type="checkbox" id="rm"> شيل الكلمة بعد ما تظهر</label></div>
+<div class="res" id="res"><div class="ar">اختار الأقسام واضغط SPIN</div></div>
+<div class="cnt" id="cnt"></div>
+<script>
+const CATS={
+g:{n:"Gerund verbs",c:"#d85a30",r:"+ V-ing"},
+p:{n:"After prepositions",c:"#7f5fd0",r:"+ V-ing (بعد حرف جر)"},
+e:{n:"Expressions",c:"#1d9e75",r:"+ V-ing (تعبير)"},
+i:{n:"Infinitive verbs",c:"#2f7fd1",r:"+ to + infinitive"},
+o:{n:"Verb + object + to",c:"#c2417a",r:"+ object + to + inf"},
+w:{n:"Without to",c:"#8a8a2a",r:"+ infinitive بدون to"},
+b:{n:"Both (small change)",c:"#e0922b",r:"to + inf أو V-ing"},
+c:{n:"Both (big change)",c:"#b8382e",r:"to + inf أو V-ing بمعنى مختلف"},
+n:{n:"Notes",c:"#5a6b78",r:"ملاحظة من الملف"}};
+const RAW=`g|admit|يعترف بـ
+g|adore|يعشق
+g|appreciate|يقدر
+g|avoid|يتجنب
+g|consider (= think of)|يفكر في
+g|delay|يؤخر
+g|deny|ينكر
+g|despise|يمقت – يبغض
+g|detest|يكره بشدة
+g|enjoy|يستمتع بـ
+g|finish|ينهي
+g|face|يواجه
+g|imagine|يتخيل
+g|keep (on)|يستمر في
+g|mention|يذكر
+g|miss|يفتقد
+g|practise|يمارس
+g|prevent|يمنع
+g|quit|يترك
+g|recommend|يوصي بـ
+g|risk|يخاطر
+g|suggest|يقترح
+g|involve|يتضمن
+g|include|يشمل
+g|dislike|يكره
+g|admit to|يعترف
+p|without|بدون
+p|put off|يؤجل
+p|give up|يقلع عن
+p|keen on|حريص على
+p|What/How about|ماذا عن
+p|succeed in|ينجح في
+p|interested in|مهتم بـ
+p|long for|يشتاق إلى
+p|shocked at|صدم لـ
+e|be/get used to|معتاد على
+e|be accustomed to|معتاد على
+e|look forward to|يتطلع إلى
+e|object to|يعترض على
+e|contribute to|يساهم
+e|devote (his life) to|يكرس – يهب
+e|adapt to|يتكيف مع
+e|lead to|يؤدي إلى
+e|addicted to|مدمن لـ
+e|in addition to|بالإضافة إلى
+e|thanks to|بسبب
+e|can't resist|لا يقاوم
+e|can't stand|لا يطيق
+e|can't help|لا يستطيع فعل شيء حيال
+e|(Do you) mind|يمانع
+e|(be) worth|يساوي – يستحق
+e|(Do you) fancy|هل تتخيل – هل تحب
+e|be opposed to|معترض على
+e|it's no use / no good|لا فائدة من
+e|feel like|يميل إلى
+e|I am busy…|مشغول
+e|due to / owing to|بسبب
+e|spend the night…|يقضي الليل
+e|have fun…|يستمتع بـ
+e|have difficulty…|لديه صعوبة
+e|spend his time…|يقضي وقته
+e|waste his time…|يضيع وقته
+e|he stood/sat there…|جلس
+e|I found/saw him…|رأيته
+e|go swimming/shopping/camping…|يذهب لـ (سباحة / تسوق / تخييم)
+i|afford|يقوى على ثمن
+i|agree|يوافق
+i|arrange|يرتب
+i|attempt|يحاول
+i|dare|يجرؤ
+i|decide|يقرر
+i|demand|يطلب
+i|deserve|يستحق
+i|determined|مصمم على
+i|expect|يتوقع
+i|fail|يفشل في
+i|hope|يأمل
+i|learn|يتعلم
+i|long|يشتاق إلى
+i|manage|ينجح في
+i|mean|يقصد
+i|need|يحتاج
+i|offer|يعرض
+i|plan|يخطط
+i|pretend|يتظاهر
+i|refuse|يرفض
+i|seem|يبدو
+i|shocked|يصدم
+i|threaten|يهدد
+i|used|اعتاد أن
+i|want|يريد
+i|warn|يحذر
+i|wish|يأمل
+i|choose|يختار
+i|would like|يريد
+i|would love|يحب أن
+i|would prefer|يفضل
+o|advise|ينصح
+o|allow|يسمح
+o|ask|يطلب
+o|beg|يترجى
+o|consider|يعتبر
+o|enable|يمكّن
+o|encourage|يشجع
+o|help|يساعد
+o|invite|يدعو
+o|order|يأمر
+o|persuade|يقنع
+o|promise|يعد
+o|require|يتطلب
+o|remind|يُذكر
+o|teach|يعلم
+o|tell|يخبر
+w|make|يجعل
+w|let / let's|يدع – هيا بنا
+w|I'd better|من الأفضل أن
+w|I'd rather … than…|أفضّل … من
+w|shall – should|فعل مساعد
+w|will – would|فعل مساعد
+w|can – could|فعل مساعد
+w|may – might|فعل مساعد
+w|must|فعل مساعد
+w|needn't|فعل مساعد
+w|do – don't|مساعد
+w|does – doesn't|مساعد
+w|did – didn't|مساعد
+b|begin|يبدأ
+b|start|يبدأ
+b|can't bear|لا يطيق – لا يتحمل
+b|continue|يستمر في
+b|intend|ينوي
+b|love / like|يحب
+b|hate|يكره
+b|prefer|يفضل
+c|remember|يتذكر
+c|forget|ينسى
+c|regret|يندم – يؤسفه
+c|try|يحاول – يجرب
+c|stop|يتوقف
+i|I don't know what/where/how…|لا أعرف ماذا / أين / كيف أفعل
+i|It took me a long time…|استغرق مني وقتًا طويلًا
+i|the first / the last…|الأول / الأخير
+n|forbid|يمنع
+n|permit|يسمح
+n|hear|يسمع
+n|see|يرى
+n|watch|يشاهد
+n|notice|يلاحظ`;
+const ITEMS=RAW.split("\n").map(l=>{const [c,en,ar]=l.split("|");return{c,en,ar}});
+const on=new Set(Object.keys(CATS));let used=new Set();try{used=new Set(JSON.parse(localStorage.getItem('gi_used')||'[]'));document.getElementById('rm').checked=localStorage.getItem('gi_rm')==='1'}catch(e){}
+function save(){try{localStorage.setItem('gi_used',JSON.stringify([...used]));localStorage.setItem('gi_rm',document.getElementById('rm').checked?'1':'0')}catch(e){}}
+document.getElementById('rm').onchange=save;
+const SEED=["regret", "stop", "try", "forget", "remember", "can't stand", "look forward to", "spend his time…", "admit to", "be/get used to", "suggest", "object to", "enjoy", "can't help", "avoid", "feel like", "recommend", "it's no use / no good", "keep (on)", "deny", "in addition to", "detest", "adapt to", "practise", "(be) worth", "prefer", "afford", "decide", "promise", "manage", "agree", "hope", "enable", "It took me a long time…", "would love", "mean", "threaten", "would prefer", "used"];try{if(!localStorage.getItem('gi_seed1')){SEED.forEach(x=>used.add(x));localStorage.setItem('gi_seed1','1');save()}}catch(e){SEED.forEach(x=>used.add(x))}let rot=0,spinning=false;
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d"),S=840;
+const chips=document.getElementById("chips");
+function mk(label,fn,col){const b=document.createElement("button");b.className="chip";b.textContent=label;if(col)b.style.setProperty("--c",col);b.onclick=fn;chips.appendChild(b);return b}
+const btns={};
+Object.keys(CATS).forEach(k=>{btns[k]=mk(CATS[k].n+" ("+ITEMS.filter(x=>x.c==k).length+")",()=>{on.has(k)?on.delete(k):on.add(k);sync()},CATS[k].c)});
+mk("الكل",()=>{Object.keys(CATS).forEach(k=>on.add(k));sync()},"#444");
+mk("إعادة",()=>{used.clear();save();sync()},"#444");
+function pool(){return ITEMS.filter(x=>on.has(x.c)&&!used.has(x.en))}
+function sync(){Object.keys(btns).forEach(k=>btns[k].classList.toggle("on",on.has(k)));draw();document.getElementById("cnt").textContent="الكلمات المتاحة: "+pool().length}
+function draw(){
+const P=pool(),n=P.length;ctx.clearRect(0,0,S,S);
+const cx=S/2,R=S/2-8;
+if(!n){ctx.fillStyle="#999";ctx.font="32px sans-serif";ctx.textAlign="center";ctx.fillText("اختار قسم",cx,cx);return}
+const a=2*Math.PI/n;
+P.forEach((it,i)=>{
+ctx.beginPath();ctx.moveTo(cx,cx);ctx.arc(cx,cx,R,rot+i*a,rot+(i+1)*a);ctx.closePath();
+ctx.fillStyle=["#d85a30","#2f7fd1","#1d9e75","#e0922b","#7f5fd0","#c2417a"][i%6];ctx.fill();
+if(n<=140){ctx.strokeStyle="#fff";ctx.lineWidth=n>60?1:2;ctx.stroke()}
+if(n<=45){ctx.save();ctx.translate(cx,cx);ctx.rotate(rot+(i+.5)*a);ctx.fillStyle="#fff";ctx.textAlign="right";ctx.textBaseline="middle";
+const fs=Math.max(14,Math.min(26,a*R*0.5));ctx.font="600 "+fs+"px sans-serif";
+let t=it.en;if(t.length>22)t=t.slice(0,21)+"…";ctx.fillText(t,R-16,0);ctx.restore()}
+});
+ctx.beginPath();ctx.arc(cx,cx,34,0,7);ctx.fillStyle="#fff";ctx.fill();ctx.strokeStyle="#bbb";ctx.lineWidth=3;ctx.stroke();
+}
+function show(it){
+document.getElementById("res").innerHTML='<div class="en"></div><div class="ar"></div>';
+const r=document.getElementById("res");
+r.querySelector(".en").textContent=it.en;r.querySelector(".ar").textContent=it.ar;
+}
+document.getElementById("go").onclick=()=>{
+if(spinning)return;const P=pool(),n=P.length;if(!n)return;
+spinning=true;document.getElementById("go").disabled=true;
+const a=2*Math.PI/n,start=rot,tgt=start+Math.random()*2*Math.PI+Math.PI,dur=300,t0=performance.now();
+(function f(t){
+const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,4);rot=start+(tgt-start)*e;draw();
+if(p<1)return requestAnimationFrame(f);
+const ang=(((1.5*Math.PI-rot)%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+const it=P[Math.min(n-1,Math.floor(ang/a))];show(it);
+if(document.getElementById("rm").checked){used.add(it.en);save()}
+spinning=false;document.getElementById("go").disabled=false;sync();
+})(t0);
+};
+sync();
+</script></body></html>
